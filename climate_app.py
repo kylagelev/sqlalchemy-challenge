@@ -19,8 +19,8 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    print("Welcome")
-    return (f"Welcome to the Climate App."
+    print("Climate App")
+    return (f"Welcome to the Climate App.<br/><br/>"
             "Available Routes:<br/>" 
             "/api/v1.0/precipitation<br/>"
             "/api/v1.0/stations<br/>"
@@ -44,19 +44,32 @@ def precipitation():
 @app.route('/api/v1.0/stations')
 def stations():
     session = Session(engine)
-
-    return
+    station = Base.classes.station
+    results = session.query(station.station).all()
+    station_list = []
+    for station in results:
+        station_name = station
+        station_list.append(station_name)
+        
+    return jsonify(station_list)
 
 @app.route('/api/v1.0/tobs')
 def tob():
     session = Session(engine)
+    max_station = session.query(measurement.station, func.count(measurement.station)).group_by(measurement.station).\
+        order_by(func.count(measurement.station).desc()).limit(1)[0][0]
+    temp_max_station = session.query(measurement.tobs).filter(measurement.station == max_station).all()
+    
+    temp_list = []
+    for temp in temp_max_station:
+        temperature = temp
+        temp_list.append(temperature)
 
-    return
+    return jsonify(temp_list)
 
 @app.route('/api/v1.0/<start>') 
 def start():
     session = Session(engine)
-
 
     return
 
@@ -65,3 +78,7 @@ def startend():
     session = Session(engine)
 
     return
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
