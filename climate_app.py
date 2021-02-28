@@ -4,6 +4,7 @@ import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
+from datetime import datetime, timedelta
 
 from flask import Flask, jsonify
 
@@ -46,10 +47,13 @@ def stations():
     session = Session(engine)
     station = Base.classes.station
     results = session.query(station.station).all()
+
     station_list = []
     for station in results:
         station_name = station
         station_list.append(station_name)
+    
+    session.close()
         
     return jsonify(station_list)
 
@@ -58,20 +62,34 @@ def tob():
     session = Session(engine)
     max_station = session.query(measurement.station, func.count(measurement.station)).group_by(measurement.station).\
         order_by(func.count(measurement.station).desc()).limit(1)[0][0]
-    temp_max_station = session.query(measurement.tobs).filter(measurement.station == max_station).all()
+    temp_max_station = session.query(measurement.date, measurement.tobs).filter(measurement.station == max_station).all()
+    max_date = session.query(measurement.date, measurement.tobs).filter(measurement.station == max_station).\
+        order_by((measurement.date).desc()).limit(1)[0][0]
     
-    temp_list = []
-    for temp in temp_max_station:
+    tempdate_list = []
+    for date, temp in temp_max_station: 
+        date_temp = date
         temperature = temp
-        temp_list.append(temperature)
+        tempdate_list.append(date_temp, temperature)
 
-    return jsonify(temp_list)
+    return jsonify(temp_list, max_date)
 
 @app.route('/api/v1.0/<start>') 
 def start():
     session = Session(engine)
 
-    return
+    dated = start.replace(" ", " ", "").dateframe(-)
+    
+    temp_min_start = session.query(func.min(measurement.tobs)).filter(measurement.date >= start).all()
+    temp_max_start = session.query(func.max(measurement.tobs)).filter(measurement.date >= start).all()
+    temp_avg_start = session.query(func.avg(measurement.tobs)).filter(measurement.date >= start).all()
+    
+    temp_stats = []
+    temp_stats.append(temp_min_start, temp_max_start, temp_avg_start)
+    if search_term == dated:
+        return jsonify(temp_stats)
+
+    return ("Date Not Included.")
 
 @app.route('/api/v1.0/<start>/<end>')
 def startend():
