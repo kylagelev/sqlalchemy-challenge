@@ -40,6 +40,9 @@ def precipitation():
         prcp_dict["date"] = date
         prcp_dict["prcp"] = prcp
         prcp_dates.append(prcp_dict)
+
+    session.close()
+
     return jsonify(prcp_dates)
 
 @app.route('/api/v1.0/stations')
@@ -72,6 +75,8 @@ def tob():
         temperature = temp
         tempdate_list.append(date_temp, temperature)
 
+    session.close()
+
     return jsonify(tempdate_list, max_date)
 
 @app.route('/api/v1.0/<start>') 
@@ -87,13 +92,28 @@ def start(start):
         tobs_dict['max'] = max_temp 
         tobs_dict['avg'] = avg_temp
         temp_stats.append(tobs_dict)
+
+    session.close()
+
     return jsonify(temp_stats)
 
 @app.route('/api/v1.0/<start>/<end>')
-def startend():
-  # session = Session(engine)
+def startend(start, end):
+    session = Session(engine)
 
-    return
+    temp_end_start = session.query(func.min(measurement.tobs), func.max(measurement.tobs), func.avg(measurement.tobs)).filter(measurement.date >= start).filter(measurement.date <= end).all()
+
+    temp_start_end_stats = []
+    for min_temp, max_temp, avg_temp in temp_end_start:
+        tobs_dict = {}
+        tobs_dict['min'] = min_temp
+        tobs_dict['max'] = max_temp 
+        tobs_dict['avg'] = avg_temp
+        temp_start_end_stats.append(tobs_dict)
+
+    session.close()
+
+    return jsonify(temp_start_end_stats)
 
 
 if __name__ == '__main__':
