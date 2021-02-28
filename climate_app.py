@@ -72,28 +72,26 @@ def tob():
         temperature = temp
         tempdate_list.append(date_temp, temperature)
 
-    return jsonify(temp_list, max_date)
+    return jsonify(tempdate_list, max_date)
 
 @app.route('/api/v1.0/<start>') 
-def start():
+def start(start):
     session = Session(engine)
 
-    dated = start.replace(" ", " ", "").dateframe(-)
-    
-    temp_min_start = session.query(func.min(measurement.tobs)).filter(measurement.date >= start).all()
-    temp_max_start = session.query(func.max(measurement.tobs)).filter(measurement.date >= start).all()
-    temp_avg_start = session.query(func.avg(measurement.tobs)).filter(measurement.date >= start).all()
-    
-    temp_stats = []
-    temp_stats.append(temp_min_start, temp_max_start, temp_avg_start)
-    if search_term == dated:
-        return jsonify(temp_stats)
+    temp_start = session.query(func.min(measurement.tobs), func.max(measurement.tobs), func.avg(measurement.tobs)).filter(measurement.date >= start).all()
 
-    return ("Date Not Included.")
+    temp_stats = []
+    for min_temp, max_temp, avg_temp in temp_start:
+        tobs_dict = {}
+        tobs_dict['min'] = min_temp
+        tobs_dict['max'] = max_temp 
+        tobs_dict['avg'] = avg_temp
+        temp_stats.append(tobs_dict)
+    return jsonify(temp_stats)
 
 @app.route('/api/v1.0/<start>/<end>')
 def startend():
-    session = Session(engine)
+  # session = Session(engine)
 
     return
 
