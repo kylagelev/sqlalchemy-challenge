@@ -12,17 +12,12 @@ app = Flask(__name__)
 def home():
     print("Welcome")
     return (f"Welcome to the Climate App."
-            "Available Routes:" 
-            <br/>
-            "/api/v1.0/precipitation"
-            <br/>
-            "/api/v1.0/stations"
-            <br/>
-            "/api/v1.0/tobs"
-            <br/>
-            "/api/v1.0/<start>"
-            <br/>
-            "/api/v1.0/<start>/<end>")
+            "Available Routes:<br/>" 
+            "/api/v1.0/precipitation<br/>"
+            "/api/v1.0/stations<br/>"
+            "/api/v1.0/tobs<br/>"
+            "/api/v1.0/<start><br/>"
+            "/api/v1.0/<start>/<end><br/>")
 
 
 
@@ -30,14 +25,25 @@ def home():
 @app.route('/api/v1.0/precipitation')
 def precipitation():
 
+    return
+
 @app.route('/api/v1.0/stations')
 def stations():
+
+    return
 
 @app.route('/api/v1.0/tobs')
 def tob():
 
+    return
+
 @app.route('/api/v1.0/<start>') 
 def start():
 
+
+    return
+
 @app.route('/api/v1.0/<start>/<end>')
-def start/end():
+def startend():
+
+    return
