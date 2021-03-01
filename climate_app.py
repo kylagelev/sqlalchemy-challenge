@@ -122,6 +122,5 @@ def startend(start, end):
 
     return jsonify(temp_start_end_stats)
 
-
 if __name__ == '__main__':
     app.run(debug=True)
