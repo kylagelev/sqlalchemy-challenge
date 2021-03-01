@@ -65,19 +65,26 @@ def tob():
     session = Session(engine)
     max_station = session.query(measurement.station, func.count(measurement.station)).group_by(measurement.station).\
         order_by(func.count(measurement.station).desc()).limit(1)[0][0]
-    temp_max_station = session.query(measurement.date, measurement.tobs).filter(measurement.station == max_station).all()
     max_date = session.query(measurement.date, measurement.tobs).filter(measurement.station == max_station).\
         order_by((measurement.date).desc()).limit(1)[0][0]
+    year_less_max_date = session.query(measurement.date - 1, measurement.tobs).filter(measurement.station == max_station).\
+        order_by((measurement.date).desc()).limit(1)[0][0]
+
+#wanted to make it so that with the max_date, we get a year subtracted, and then the same date itself from the split function
+    date_break = max_date.split('-')
+    temp_max_station = session.query(measurement.date, measurement.tobs).filter(measurement.station == max_station).filter(measurement.date <= max_station).filter(measurement.date >= f'{year_less_max_date}-{date_break[1]}-{date_break[2]}').all()
     
     tempdate_list = []
     for date, temp in temp_max_station: 
-        date_temp = date
-        temperature = temp
-        tempdate_list.append(date_temp, temperature)
+        max_tobs_dict = {}
+        max_tobs_dict['date'] = date
+        max_tobs_dict['temp'] = temp
+        tempdate_list.append(max_tobs_dict)
 
     session.close()
+    comment = 'Top Station TOBS within last 12 month interval'
 
-    return jsonify(tempdate_list, max_date)
+    return jsonify(comment, tempdate_list)
 
 @app.route('/api/v1.0/<start>') 
 def start(start):
