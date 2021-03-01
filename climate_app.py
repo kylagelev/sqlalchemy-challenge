@@ -22,12 +22,17 @@ app = Flask(__name__)
 def home():
     print("Climate App")
     return (f"Welcome to the Climate App.<br/><br/>"
+            "Please write all dates in format: YYYY-MM-DD<br/>"
+            "For example: 2014-03-04<br/><br/>"
             "Available Routes:<br/>" 
             "/api/v1.0/precipitation<br/>"
             "/api/v1.0/stations<br/>"
             "/api/v1.0/tobs<br/>"
             "/api/v1.0/<start><br/>"
-            "/api/v1.0/<start>/<end><br/>")
+            "/api/v1.0/<start>/<end><br/><br/>"
+            "** For /api/v1.0/<start>/<end>, please write start date / end date for search<br/>"
+            "For example: /api/v1.0/2014-03-04/2016-05-06")
+
 
 @app.route('/api/v1.0/precipitation')
 def precipitation():
